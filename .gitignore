@@ -28,6 +28,7 @@
 
 # Privat
 docs/
+path/
 
 # Build-Ordner
 cmake-build-debug/
@@ -40,24 +41,19 @@ Makefile
 install_manifest.txt
 
 # CLion & JetBrains spezifische Dateien
-.idea/
 *.iml
 *.zip
 *.pdf
 
 # Compiler-Ausgaben
 *.o
-*.obj
 *.exe
 *.out
-*.a
-*.so
-*.dll
 *.app
 
 # Extra
 .vscode
-data
+data/
 
 # Log-Dateien
 *.log
