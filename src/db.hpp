@@ -23,6 +23,9 @@ public:
 
     void printAllUsers();
 
+    void updateUser(int id, const std::string& newName, int newAge);
+
+
 
 
 

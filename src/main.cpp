@@ -15,10 +15,12 @@ int main() {
 
     //db.insertUser("Kilian", 24);
     //db.insertUser("GitHub", 30);
+    db.updateUser(1, "Kilian L.", 25);
+
 
     db.printAllUsers();
 
 
-    db.testConnection();
+    Database::testConnection();
     return 0;
 }

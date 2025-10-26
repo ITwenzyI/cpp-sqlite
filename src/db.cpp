@@ -35,12 +35,15 @@ void Database::createTable() {
     sqlite3_stmt* stmt = nullptr;
 
     // 1. prepare
+    // Bereitet SQL-Statement vor | Parst die SQL-Zeichenkette,
+    // Prüft Syntax und erzeugt ein internes Query-Objekt (vom Typ sqlite3_stmt*), das später ausgeführt werden kann.
     if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Prepare-Fehler: " << sqlite3_errmsg(db_) << "\n";
         return;
     }
 
     // 2. step (ausführen)
+    // Führt das vorbereitete Statement einmal aus.
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         std::cerr << "Step-Fehler: " << sqlite3_errmsg(db_) << "\n";
     } else {
@@ -56,12 +59,15 @@ void Database::insertUser(const std::string& name, int age) {
     sqlite3_stmt* stmt = nullptr;
 
     // 1. Prepare
+    // Bereitet SQL-Statement vor | Parst die SQL-Zeichenkette,
+    // Prüft Syntax und erzeugt ein internes Query-Objekt (vom Typ sqlite3_stmt*), das später ausgeführt werden kann.
     if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Prepare-Fehler (INSERT): " << sqlite3_errmsg(db_) << "\n";
         return;
     }
 
     // 2. Parameter binden
+    // sqlite3_bind_* ersetzt die ?-Platzhalter im SQL-Statement durch echte Werte.
     sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_STATIC);  // 1. Platzhalter
     sqlite3_bind_int(stmt, 2, age);                                // 2. Platzhalter
 
@@ -82,6 +88,8 @@ void Database::printAllUsers() {
     sqlite3_stmt* stmt = nullptr;
 
     // 1. Statement vorbereiten
+    // Bereitet SQL-Statement vor | Parst die SQL-Zeichenkette,
+    // Prüft Syntax und erzeugt ein internes Query-Objekt (vom Typ sqlite3_stmt*), das später ausgeführt werden kann.
     if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Prepare-Fehler (SELECT): " << sqlite3_errmsg(db_) << "\n";
         return;
@@ -90,6 +98,9 @@ void Database::printAllUsers() {
     std::cout << "Alle Benutzer:\n";
 
     // 2. Ergebnisse Zeile für Zeile durchgehen
+    // Führt das vorbereitete Statement mehrmals aus.
+    // wiederholter Aufruf von sqlite3_step(stmt) gibt Zeile für Zeile → SQLITE_ROW
+    // → danach SQLITE_DONE, wenn keine Zeilen mehr
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         int id         = sqlite3_column_int(stmt, 0);
         const unsigned char* name = sqlite3_column_text(stmt, 1);
@@ -104,4 +115,36 @@ void Database::printAllUsers() {
     // 3. Statement freigeben
     sqlite3_finalize(stmt);
 }
+
+
+void Database::updateUser(int id, const std::string& newName, int newAge) {
+    const char* sql = "UPDATE users SET name = ?, age = ? WHERE id = ?;";
+    sqlite3_stmt* stmt = nullptr;
+
+    // 1. Prepare
+    // Bereitet SQL-Statement vor | Parst die SQL-Zeichenkette,
+    // Prüft Syntax und erzeugt ein internes Query-Objekt (vom Typ sqlite3_stmt*), das später ausgeführt werden kann.
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Prepare-Fehler (UPDATE): " << sqlite3_errmsg(db_) << "\n";
+        return;
+    }
+
+    // 2. Bind Parameter
+    // sqlite3_bind_* ersetzt die ?-Platzhalter im SQL-Statement durch echte Werte.
+    sqlite3_bind_text(stmt, 1, newName.c_str(), -1, SQLITE_STATIC); // name
+    sqlite3_bind_int(stmt, 2, newAge);                               // age
+    sqlite3_bind_int(stmt, 3, id);                                   // id (WHERE)
+
+    // 3. Ausführen
+    // Führt das vorbereitete Statement einmal aus.
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        std::cerr << "Step-Fehler (UPDATE): " << sqlite3_errmsg(db_) << "\n";
+    } else {
+        std::cout << "User mit ID " << id << " aktualisiert.\n";
+    }
+
+    // 4. Freigeben
+    sqlite3_finalize(stmt);
+}
+
 
