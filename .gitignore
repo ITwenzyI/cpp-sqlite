@@ -29,7 +29,7 @@
 # Privat
 docs/
 path/
-
+infos/*
 # Build-Ordner
 cmake-build-debug/
 cmake-build-release/
@@ -61,3 +61,4 @@ data/
 # Mac/Linux spezifisch (falls du zwischen Windows & macOS arbeitest)
 .DS_Store
 *.swp
+/infos/*
