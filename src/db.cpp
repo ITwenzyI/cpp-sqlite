@@ -22,6 +22,7 @@ Database::~Database() {
 // CREATE TABLE
 
 void Database::createTable() {
+    // R"(...)" = Raw String -> String genauso schreiben, wie in SQL
     const char* sql = R"(
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
