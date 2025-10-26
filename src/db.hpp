@@ -24,6 +24,9 @@ public:
 
     void deleteUserByID(int id);
 
+    void findUserByName(const std::string& name);
+
+
 
 
 

@@ -189,3 +189,44 @@ void Database::deleteUserByID(int id) {
 
 
 
+// FIND USER BY NAME
+
+
+void Database::findUserByName(const std::string& name) {
+    const char* sql = "SELECT id, name, age FROM users WHERE name = ?;";
+    sqlite3_stmt* stmt = nullptr;
+
+    // 1. Statement vorbereiten
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Prepare-Fehler (FIND): " << sqlite3_errmsg(db_) << "\n";
+        return;
+    }
+
+    // 2. Name binden
+    sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_STATIC);
+
+    // 3. Durch alle Treffer iterieren
+    bool found = false;
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        int id = sqlite3_column_int(stmt, 0);
+        const unsigned char* nameText = sqlite3_column_text(stmt, 1);
+        int age = sqlite3_column_int(stmt, 2);
+
+        std::cout << "ID: " << id
+                  << " | Name: " << (nameText ? reinterpret_cast<const char*>(nameText) : "NULL")
+                  << " | Alter: " << age << "\n";
+
+        found = true;
+    }
+
+    if (!found) {
+        std::cout << "Kein Benutzer mit dem Namen \"" << name << "\" gefunden.\n";
+    }
+
+    // 4. Statement freigeben
+    sqlite3_finalize(stmt);
+}
+
+
+
+

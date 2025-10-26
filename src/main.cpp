@@ -16,7 +16,11 @@ int main() {
     //db.insertUser("Kilian", 24);
     //db.insertUser("GitHub", 30);
     //db.updateUser(1, "Kilian L.", 25);
-    db.deleteUserByID(2);
+    //db.deleteUserByID(2);
+
+    db.findUserByName("Kilian L.");
+    db.findUserByName("Unbekannt");
+
 
 
     db.printAllUsers();
