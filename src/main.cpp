@@ -11,6 +11,14 @@
 
 int main() {
     Database db("../data/test.db");
+    db.createTable();
+
+    //db.insertUser("Kilian", 24);
+    //db.insertUser("GitHub", 30);
+
+    db.printAllUsers();
+
+
     db.testConnection();
     return 0;
 }

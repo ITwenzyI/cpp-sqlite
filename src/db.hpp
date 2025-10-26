@@ -14,7 +14,16 @@ public:
     ~Database();
 
     // Testfunktion für erste Query
-    void testConnection();
+    static void testConnection();
+
+    // Test Creation
+    void createTable();
+
+    void insertUser(const std::string& name, int age);
+
+    void printAllUsers();
+
+
 
 
 private:
