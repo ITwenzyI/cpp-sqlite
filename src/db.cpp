@@ -19,9 +19,7 @@ Database::~Database() {
     }
 }
 
-void Database::testConnection() {
-    std::cout << "[Test] Verbindung aktiv.\n";
-}
+// CREATE TABLE
 
 void Database::createTable() {
     const char* sql = R"(
@@ -54,6 +52,10 @@ void Database::createTable() {
     sqlite3_finalize(stmt);
 }
 
+
+
+// INSERT IN TABLE USERS
+
 void Database::insertUser(const std::string& name, int age) {
     const char* sql = "INSERT INTO users (name, age) VALUES (?, ?);";
     sqlite3_stmt* stmt = nullptr;
@@ -81,6 +83,11 @@ void Database::insertUser(const std::string& name, int age) {
     // 4. Aufräumen
     sqlite3_finalize(stmt);
 }
+
+
+
+
+// PRINT ALL USERS FROM TABLE USERS
 
 
 void Database::printAllUsers() {
@@ -117,6 +124,10 @@ void Database::printAllUsers() {
 }
 
 
+
+// UPDATE USER IN TABLE USERS
+
+
 void Database::updateUser(int id, const std::string& newName, int newAge) {
     const char* sql = "UPDATE users SET name = ?, age = ? WHERE id = ?;";
     sqlite3_stmt* stmt = nullptr;
@@ -146,5 +157,35 @@ void Database::updateUser(int id, const std::string& newName, int newAge) {
     // 4. Freigeben
     sqlite3_finalize(stmt);
 }
+
+
+
+// DELTE USER FROM TABLE USERS WITH ID
+
+
+void Database::deleteUserByID(int id) {
+    const char* sql = "DELETE FROM users WHERE id = ?;";
+    sqlite3_stmt* stmt = nullptr;
+
+    // 1. Statement vorbereiten
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Prepare-Fehler (DELETE): " << sqlite3_errmsg(db_) << "\n";
+        return;
+    }
+
+    // 2. ID binden
+    sqlite3_bind_int(stmt, 1, id);
+
+    // 3. Ausführen
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        std::cerr << "Step-Fehler (DELETE): " << sqlite3_errmsg(db_) << "\n";
+    } else {
+        std::cout << "User mit ID " << id << " gelöscht.\n";
+    }
+
+    // 4. Freigeben
+    sqlite3_finalize(stmt);
+}
+
 
 

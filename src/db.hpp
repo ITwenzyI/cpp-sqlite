@@ -13,9 +13,6 @@ public:
     // Destruktor schließt die DB
     ~Database();
 
-    // Testfunktion für erste Query
-    static void testConnection();
-
     // Test Creation
     void createTable();
 
@@ -25,6 +22,7 @@ public:
 
     void updateUser(int id, const std::string& newName, int newAge);
 
+    void deleteUserByID(int id);
 
 
 
