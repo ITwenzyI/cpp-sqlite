@@ -7,12 +7,10 @@
 //
 
 #include <iostream>
+#include "db.hpp"
 
-int main (){
-
-    std::cout << "Hello World!\n";
-
-
+int main() {
+    Database db("../data/test.db");
+    db.testConnection();
     return 0;
-
 }
