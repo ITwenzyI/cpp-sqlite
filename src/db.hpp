@@ -25,7 +25,7 @@ public:
 
     std::optional<User> updateUser(int id, const std::string& newName, int newAge);
 
-    void deleteUserByID(int id);
+    bool deleteUserByID(int id);
 
     std::optional<User> findUserByName(const std::string& name);
 

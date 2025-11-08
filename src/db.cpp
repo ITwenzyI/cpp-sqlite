@@ -165,7 +165,7 @@ std::optional<User> Database::updateUser(int id, const std::string& newName, int
     }
 
     // Aktualisierten User zurückgeben
-    return findUserById(id);  // Diese Methode musst du noch erstellen
+    return findUserById(id);
 }
 
 std::optional<User> Database::findUserById(int id) {
@@ -201,14 +201,14 @@ std::optional<User> Database::findUserById(int id) {
 // DELETE USER FROM TABLE USERS WITH ID
 
 
-void Database::deleteUserByID(int id) {
+bool Database::deleteUserByID(int id) {
     const char* sql = "DELETE FROM users WHERE id = ?;";
     sqlite3_stmt* stmt = nullptr;
 
     // 1. Statement vorbereiten
     if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Prepare-Fehler (DELETE): " << sqlite3_errmsg(db_) << "\n";
-        return;
+        return false;
     }
 
     // 2. ID binden
@@ -217,12 +217,13 @@ void Database::deleteUserByID(int id) {
     // 3. Ausführen
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         std::cerr << "Step-Fehler (DELETE): " << sqlite3_errmsg(db_) << "\n";
-    } else {
-        std::cout << "User mit ID " << id << " gelöscht.\n";
+        sqlite3_finalize(stmt);
+        return false;
     }
 
     // 4. Freigeben
     sqlite3_finalize(stmt);
+    return sqlite3_changes(db_) > 0;
 }
 
 

@@ -31,6 +31,13 @@ int main() {
         std::cout << "Kein Benutzer gefunden.\n";
     }
 
+    if (db.deleteUserByID(3)) {
+        std::cout << "User erfolgreich gelöscht.\n";
+    } else {
+        std::cout << "Kein User mit dieser ID gefunden.\n";
+    }
+
+
 
     auto users = db.getAllUsers();
     for (const auto& user : users) {
