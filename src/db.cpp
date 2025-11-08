@@ -235,13 +235,13 @@ DBResult Database::deleteUserById(int id) {
 // FIND USER BY NAME
 
 
-std::optional<User> Database::findUserByName(const std::string& name) {
+UserResult Database::findUserByName(const std::string& name) {
     const char* sql = "SELECT id, name, age FROM users WHERE name = ?;";
     sqlite3_stmt* stmt = nullptr;
 
     if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Prepare-Fehler (FIND): " << sqlite3_errmsg(db_) << "\n";
-        return std::nullopt;
+        return {DBResult::Error, std::nullopt};
     }
 
     sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_STATIC);
@@ -259,7 +259,11 @@ std::optional<User> Database::findUserByName(const std::string& name) {
     }
 
     sqlite3_finalize(stmt);
-    return result;
+    if (result.has_value()) {
+        return {DBResult::OK, result};
+    } else {
+        return {DBResult::NotFound, std::nullopt};
+    }
 }
 
 

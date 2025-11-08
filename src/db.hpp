@@ -3,10 +3,9 @@
 
 #include <string>
 #include <sqlite3.h>
-#include "user.hpp"
+#include "types.hpp"
 #include <vector>
 #include <optional>
-#include "db_result.hpp"
 
 
 class Database {
@@ -28,7 +27,7 @@ public:
 
     DBResult deleteUserById(int id);
 
-    std::optional<User> findUserByName(const std::string& name);
+    UserResult findUserByName(const std::string& name);
 
     std::optional<User> findUserById(int id);
 

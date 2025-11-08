@@ -18,32 +18,27 @@ int main() {
     //db.updateUser(1, "Kilian L.", 25);
     //db.deleteUserByID(2);
 
-    // if (auto user = db.findUserByName("Kilian L.")) {
-    //     std::cout << "Gefunden: ID=" << user->id << ", Name=" << user->name << ", Alter=" << user->age << "\n";
-    // } else {
+    // if (auto user = db.updateUser(1, "Kilian Update", 25)) {
+    //     std::cout << "ID=" << user->id << ", Name=" << user->name << ", Age=" << user->age << "\n";
+    // }
+    // else {
     //     std::cout << "Kein Benutzer gefunden.\n";
     // }
 
-    if (auto user = db.updateUser(1, "Kilian Update", 25)) {
-        std::cout << "ID=" << user->id << ", Name=" << user->name << ", Age=" << user->age << "\n";
-    }
-    else {
-        std::cout << "Kein Benutzer gefunden.\n";
-    }
+    UserResult res = db.findUserByName("Kilian Update");
 
-    auto result = db.deleteUserById(5);
-
-    switch (result) {
+    switch (res.status) {
         case DBResult::OK:
-            std::cout << "User gelöscht.\n";
+            std::cout << "Gefunden: " << res.user->name << ", " << res.user->age << "\n";
             break;
         case DBResult::NotFound:
-            std::cout << "Keine passende ID gefunden.\n";
+            std::cout << "Kein User mit diesem Namen gefunden.\n";
             break;
         case DBResult::Error:
-            std::cout << "Fehler bei der Datenbankoperation.\n";
+            std::cout << "Fehler beim DB-Zugriff.\n";
             break;
     }
+
 
 
 
