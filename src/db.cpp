@@ -57,7 +57,7 @@ void Database::createTable() {
 
 // INSERT IN TABLE USERS
 
-void Database::insertUser(const std::string& name, int age) {
+UserResult Database::insertUser(const std::string& name, int age) {
     const char* sql = "INSERT INTO users (name, age) VALUES (?, ?);";
     sqlite3_stmt* stmt = nullptr;
 
@@ -66,7 +66,7 @@ void Database::insertUser(const std::string& name, int age) {
     // Prüft Syntax und erzeugt ein internes Query-Objekt (vom Typ sqlite3_stmt*), das später ausgeführt werden kann.
     if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Prepare-Fehler (INSERT): " << sqlite3_errmsg(db_) << "\n";
-        return;
+        return {DBResult::Error, std::nullopt};
     }
 
     // 2. Parameter binden
@@ -83,6 +83,16 @@ void Database::insertUser(const std::string& name, int age) {
 
     // 4. Aufräumen
     sqlite3_finalize(stmt);
+
+    // Prüfen, ob eine Zeile überhaupt geändert wurde:
+    if (sqlite3_changes(db_) == 0) {
+        // Keine Änderung → ID existiert nicht
+        return {DBResult::Error, std::nullopt};
+    }
+
+    int lastId = static_cast<int>(sqlite3_last_insert_rowid(db_));
+    return findUserById(lastId);
+
 }
 
 
@@ -129,7 +139,7 @@ void Database::printAllUsers() {
 // UPDATE USER IN TABLE USERS
 
 
-std::optional<User> Database::updateUser(int id, const std::string& newName, int newAge) {
+UserResult Database::updateUser(int id, const std::string& newName, int newAge) {
     const char* sql = "UPDATE users SET name = ?, age = ? WHERE id = ?;";
     sqlite3_stmt* stmt = nullptr;
 
@@ -138,7 +148,7 @@ std::optional<User> Database::updateUser(int id, const std::string& newName, int
     // Prüft Syntax und erzeugt ein internes Query-Objekt (vom Typ sqlite3_stmt*), das später ausgeführt werden kann.
     if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Prepare-Fehler (UPDATE): " << sqlite3_errmsg(db_) << "\n";
-        return std::nullopt;
+        return {DBResult::Error, std::nullopt};
     }
 
     // 2. Bind Parameter
@@ -152,7 +162,7 @@ std::optional<User> Database::updateUser(int id, const std::string& newName, int
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         std::cerr << "Step-Fehler (UPDATE): " << sqlite3_errmsg(db_) << "\n";
         sqlite3_finalize(stmt);
-        return std::nullopt;
+        return {DBResult::Error, std::nullopt};
     }
 
     // 4. Freigeben
@@ -161,20 +171,20 @@ std::optional<User> Database::updateUser(int id, const std::string& newName, int
     // Prüfen, ob eine Zeile überhaupt geändert wurde:
     if (sqlite3_changes(db_) == 0) {
         // Keine Änderung → ID existiert nicht
-        return std::nullopt;
+        return {DBResult::NotFound, std::nullopt};
     }
 
     // Aktualisierten User zurückgeben
     return findUserById(id);
 }
 
-std::optional<User> Database::findUserById(int id) {
+UserResult Database::findUserById(int id) {
     const char* sql = "SELECT id, name, age FROM users WHERE id = ?;";
     sqlite3_stmt* stmt = nullptr;
 
     if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Prepare-Fehler (FIND): " << sqlite3_errmsg(db_) << "\n";
-        return std::nullopt;
+        return {DBResult::Error, std::nullopt};
     }
 
     sqlite3_bind_int(stmt, 1, id);        // id (WHERE)
@@ -192,7 +202,7 @@ std::optional<User> Database::findUserById(int id) {
     }
 
     sqlite3_finalize(stmt);
-    return result;
+    return {DBResult::OK, result};
 }
 
 

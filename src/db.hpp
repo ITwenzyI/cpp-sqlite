@@ -19,17 +19,17 @@ public:
     // Test Creation
     void createTable();
 
-    void insertUser(const std::string& name, int age);
+    UserResult insertUser(const std::string& name, int age);
 
     void printAllUsers();
 
-    std::optional<User> updateUser(int id, const std::string& newName, int newAge);
+    UserResult updateUser(int id, const std::string& newName, int newAge);
 
     DBResult deleteUserById(int id);
 
     UserResult findUserByName(const std::string& name);
 
-    std::optional<User> findUserById(int id);
+    UserResult findUserById(int id);
 
 
 

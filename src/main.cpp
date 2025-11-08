@@ -25,11 +25,25 @@ int main() {
     //     std::cout << "Kein Benutzer gefunden.\n";
     // }
 
-    UserResult res = db.findUserByName("Kilian Update");
+    // UserResult res = db.findUserByName("Kilian Update");
+    //
+    // switch (res.status) {
+    //     case DBResult::OK:
+    //         std::cout << "Gefunden: " << res.user->name << ", " << res.user->age << "\n";
+    //         break;
+    //     case DBResult::NotFound:
+    //         std::cout << "Kein User mit diesem Namen gefunden.\n";
+    //         break;
+    //     case DBResult::Error:
+    //         std::cout << "Fehler beim DB-Zugriff.\n";
+    //         break;
+    // }
+
+    UserResult res = db.insertUser("Neuer Kilian", 22);
 
     switch (res.status) {
         case DBResult::OK:
-            std::cout << "Gefunden: " << res.user->name << ", " << res.user->age << "\n";
+            std::cout << "Erstellt: " << res.user->name << ", " << res.user->age << ", " << res.user->id <<"\n";
             break;
         case DBResult::NotFound:
             std::cout << "Kein User mit diesem Namen gefunden.\n";
