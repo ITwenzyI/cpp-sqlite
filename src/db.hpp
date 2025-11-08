@@ -5,6 +5,7 @@
 #include <sqlite3.h>
 #include "user.hpp"
 #include <vector>
+#include <optional>
 
 
 class Database {
@@ -22,11 +23,13 @@ public:
 
     void printAllUsers();
 
-    void updateUser(int id, const std::string& newName, int newAge);
+    std::optional<User> updateUser(int id, const std::string& newName, int newAge);
 
     void deleteUserByID(int id);
 
-    void findUserByName(const std::string& name);
+    std::optional<User> findUserByName(const std::string& name);
+
+    std::optional<User> findUserById(int id);
 
 
 

@@ -129,7 +129,7 @@ void Database::printAllUsers() {
 // UPDATE USER IN TABLE USERS
 
 
-void Database::updateUser(int id, const std::string& newName, int newAge) {
+std::optional<User> Database::updateUser(int id, const std::string& newName, int newAge) {
     const char* sql = "UPDATE users SET name = ?, age = ? WHERE id = ?;";
     sqlite3_stmt* stmt = nullptr;
 
@@ -138,7 +138,7 @@ void Database::updateUser(int id, const std::string& newName, int newAge) {
     // Prüft Syntax und erzeugt ein internes Query-Objekt (vom Typ sqlite3_stmt*), das später ausgeführt werden kann.
     if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Prepare-Fehler (UPDATE): " << sqlite3_errmsg(db_) << "\n";
-        return;
+        return std::nullopt;
     }
 
     // 2. Bind Parameter
@@ -151,13 +151,50 @@ void Database::updateUser(int id, const std::string& newName, int newAge) {
     // Führt das vorbereitete Statement einmal aus.
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         std::cerr << "Step-Fehler (UPDATE): " << sqlite3_errmsg(db_) << "\n";
-    } else {
-        std::cout << "User mit ID " << id << " aktualisiert.\n";
+        sqlite3_finalize(stmt);
+        return std::nullopt;
     }
 
     // 4. Freigeben
     sqlite3_finalize(stmt);
+
+    // Prüfen, ob eine Zeile überhaupt geändert wurde:
+    if (sqlite3_changes(db_) == 0) {
+        // Keine Änderung → ID existiert nicht
+        return std::nullopt;
+    }
+
+    // Aktualisierten User zurückgeben
+    return findUserById(id);  // Diese Methode musst du noch erstellen
 }
+
+std::optional<User> Database::findUserById(int id) {
+    const char* sql = "SELECT id, name, age FROM users WHERE id = ?;";
+    sqlite3_stmt* stmt = nullptr;
+
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Prepare-Fehler (FIND): " << sqlite3_errmsg(db_) << "\n";
+        return std::nullopt;
+    }
+
+    sqlite3_bind_int(stmt, 1, id);        // id (WHERE)
+
+    std::optional<User> result;
+
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        User user;
+        user.id = sqlite3_column_int(stmt, 0);
+        const unsigned char* nameText = sqlite3_column_text(stmt, 1);
+        user.name = nameText ? reinterpret_cast<const char*>(nameText) : "";
+        user.age = sqlite3_column_int(stmt, 2);
+
+        result = user;
+    }
+
+    sqlite3_finalize(stmt);
+    return result;
+}
+
 
 
 
@@ -193,40 +230,33 @@ void Database::deleteUserByID(int id) {
 // FIND USER BY NAME
 
 
-void Database::findUserByName(const std::string& name) {
+std::optional<User> Database::findUserByName(const std::string& name) {
     const char* sql = "SELECT id, name, age FROM users WHERE name = ?;";
     sqlite3_stmt* stmt = nullptr;
 
-    // 1. Statement vorbereiten
     if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Prepare-Fehler (FIND): " << sqlite3_errmsg(db_) << "\n";
-        return;
+        return std::nullopt;
     }
 
-    // 2. Name binden
     sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_STATIC);
 
-    // 3. Durch alle Treffer iterieren
-    bool found = false;
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-        int id = sqlite3_column_int(stmt, 0);
+    std::optional<User> result;
+
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        User user;
+        user.id = sqlite3_column_int(stmt, 0);
         const unsigned char* nameText = sqlite3_column_text(stmt, 1);
-        int age = sqlite3_column_int(stmt, 2);
+        user.name = nameText ? reinterpret_cast<const char*>(nameText) : "";
+        user.age = sqlite3_column_int(stmt, 2);
 
-        std::cout << "ID: " << id
-                  << " | Name: " << (nameText ? reinterpret_cast<const char*>(nameText) : "NULL")
-                  << " | Alter: " << age << "\n";
-
-        found = true;
+        result = user;
     }
 
-    if (!found) {
-        std::cout << "Kein Benutzer mit dem Namen \"" << name << "\" gefunden.\n";
-    }
-
-    // 4. Statement freigeben
     sqlite3_finalize(stmt);
+    return result;
 }
+
 
 
 std::vector<User> Database::getAllUsers() {
