@@ -66,8 +66,12 @@ int main() {
                   << " | Alter: " << user.age << '\n';
     }
 
+    db.exportUsersToCSV("../data/users.csv");
+    Database db2("../data/test.db2");
+    // db2.createTable();
+     db2.importUsersFromCSV("../data/users.csv");
+    db2.printAllUsers();
 
-    runDatabaseTests(db);
 
 
     return 0;

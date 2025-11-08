@@ -27,6 +27,4 @@ void runDatabaseTests(Database& db) {
 
     if (db.deleteUserById(id) != DBResult::OK)
         std::cerr << "Delete fehlgeschlagen\n";
-
-    std::cout << "Alle Tests durchgelaufen\n";
 }

@@ -1,5 +1,7 @@
 #include "db.hpp"
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 Database::Database(const std::string& db_path)
     : db_(nullptr)
@@ -306,6 +308,82 @@ std::vector<User> Database::getAllUsers() {
 }
 
 
+
+
+
+
+
+
+bool Database::exportUsersToCSV(const std::string& filename) {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Fehler beim Öffnen der Datei: " << filename << "\n";
+        return false;
+    }
+
+    // Header
+    file << "id;name;age\n\n";
+
+    const char sep = ';';
+
+    // Alle User holen
+    std::vector<User> users = getAllUsers();
+
+    for (const auto& user : users) {
+        file << user.id << sep << "\"" << user.name << "\"" << sep << user.age << "\n";
+    }
+
+    file.close();
+    std::cout << "Export erfolgreich: " << filename << "\n";
+    return true;
+}
+
+bool Database::importUsersFromCSV(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Fehler beim Öffnen der Datei: " << filename << "\n";
+        return false;
+    }
+
+    std::vector<std::string> lines;
+    std::string zeile;
+
+    // Header & Leerzeile entfernen
+    std::string header;
+    std::getline(file, header);  // Header einfach überspringen
+
+    while (std::getline(file, zeile)) {
+        if (!zeile.empty()) {
+            lines.push_back(zeile);
+        }
+    }
+    file.close();
+
+    if (lines.size() < 2) return false;  // Kein Inhalt
+
+
+    for (const auto& line : lines) {
+        std::stringstream ss(line);
+        std::string item;
+        std::vector<std::string> tokens;
+
+        while (std::getline(ss, item, ';')) {
+            // Anführungszeichen entfernen
+            if (!item.empty() && item.front() == '"') item.erase(0, 1);
+            if (!item.empty() && item.back() == '"') item.pop_back();
+            tokens.push_back(item);
+        }
+
+        User user;
+        user.id = std::stoi(tokens[0]);
+        user.name = tokens[1];
+        user.age = std::stoi(tokens[2]);
+        insertUser(user.name, user.age);
+    }
+
+    std::cout << "Import erfolgreich aus: " << filename << "\n";
+    return true;
+}
 
 
 

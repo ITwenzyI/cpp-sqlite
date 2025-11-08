@@ -36,6 +36,12 @@ public:
     std::vector<User> getAllUsers();
 
 
+
+
+    bool exportUsersToCSV(const std::string& filename);
+    bool importUsersFromCSV(const std::string& filename);
+
+
 private:
     sqlite3* db_; // roher C-Pointer auf die SQLite DB
 };
