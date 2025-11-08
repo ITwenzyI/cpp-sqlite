@@ -31,11 +31,20 @@ int main() {
         std::cout << "Kein Benutzer gefunden.\n";
     }
 
-    if (db.deleteUserByID(3)) {
-        std::cout << "User erfolgreich gelöscht.\n";
-    } else {
-        std::cout << "Kein User mit dieser ID gefunden.\n";
+    auto result = db.deleteUserById(5);
+
+    switch (result) {
+        case DBResult::OK:
+            std::cout << "User gelöscht.\n";
+            break;
+        case DBResult::NotFound:
+            std::cout << "Keine passende ID gefunden.\n";
+            break;
+        case DBResult::Error:
+            std::cout << "Fehler bei der Datenbankoperation.\n";
+            break;
     }
+
 
 
 

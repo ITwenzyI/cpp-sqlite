@@ -6,6 +6,7 @@
 #include "user.hpp"
 #include <vector>
 #include <optional>
+#include "db_result.hpp"
 
 
 class Database {
@@ -25,7 +26,7 @@ public:
 
     std::optional<User> updateUser(int id, const std::string& newName, int newAge);
 
-    bool deleteUserByID(int id);
+    DBResult deleteUserById(int id);
 
     std::optional<User> findUserByName(const std::string& name);
 

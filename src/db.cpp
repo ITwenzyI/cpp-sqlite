@@ -201,14 +201,14 @@ std::optional<User> Database::findUserById(int id) {
 // DELETE USER FROM TABLE USERS WITH ID
 
 
-bool Database::deleteUserByID(int id) {
+DBResult Database::deleteUserById(int id) {
     const char* sql = "DELETE FROM users WHERE id = ?;";
     sqlite3_stmt* stmt = nullptr;
 
     // 1. Statement vorbereiten
     if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Prepare-Fehler (DELETE): " << sqlite3_errmsg(db_) << "\n";
-        return false;
+        return DBResult::Error;
     }
 
     // 2. ID binden
@@ -218,12 +218,16 @@ bool Database::deleteUserByID(int id) {
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         std::cerr << "Step-Fehler (DELETE): " << sqlite3_errmsg(db_) << "\n";
         sqlite3_finalize(stmt);
-        return false;
+        return DBResult::Error;
     }
 
     // 4. Freigeben
     sqlite3_finalize(stmt);
-    return sqlite3_changes(db_) > 0;
+    if (sqlite3_changes(db_) == 0) {
+        return DBResult::NotFound;
+    }
+
+    return DBResult::OK;
 }
 
 
