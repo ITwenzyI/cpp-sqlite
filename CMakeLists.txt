@@ -12,6 +12,7 @@ add_executable(database_demo
         ${SOURCES}
         sqlite/sqlite3.c
         src/types.hpp
+        src/test/test_db.hpp
 )
 
 target_include_directories(database_demo PRIVATE sqlite)

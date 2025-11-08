@@ -77,8 +77,7 @@ UserResult Database::insertUser(const std::string& name, int age) {
     // 3. Ausführen
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         std::cerr << "Step-Fehler (INSERT): " << sqlite3_errmsg(db_) << "\n";
-    } else {
-        std::cout << "User eingefügt: " << name << ", Alter " << age << "\n";
+        return {DBResult::Error, std::nullopt};
     }
 
     // 4. Aufräumen

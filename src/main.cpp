@@ -8,6 +8,8 @@
 
 #include <iostream>
 #include "db.hpp"
+#include "test/test_db.hpp"
+
 
 int main() {
     Database db("../data/test.db");
@@ -39,19 +41,19 @@ int main() {
     //         break;
     // }
 
-    UserResult res = db.insertUser("Neuer Kilian", 22);
-
-    switch (res.status) {
-        case DBResult::OK:
-            std::cout << "Erstellt: " << res.user->name << ", " << res.user->age << ", " << res.user->id <<"\n";
-            break;
-        case DBResult::NotFound:
-            std::cout << "Kein User mit diesem Namen gefunden.\n";
-            break;
-        case DBResult::Error:
-            std::cout << "Fehler beim DB-Zugriff.\n";
-            break;
-    }
+    // UserResult res = db.insertUser("Neuer Kilian", 22);
+    //
+    // switch (res.status) {
+    //     case DBResult::OK:
+    //         std::cout << "Erstellt: " << res.user->name << ", " << res.user->age << ", " << res.user->id <<"\n";
+    //         break;
+    //     case DBResult::NotFound:
+    //         std::cout << "Kein User mit diesem Namen gefunden.\n";
+    //         break;
+    //     case DBResult::Error:
+    //         std::cout << "Fehler beim DB-Zugriff.\n";
+    //         break;
+    // }
 
 
 
@@ -65,7 +67,8 @@ int main() {
     }
 
 
-    //db.printAllUsers();
+    runDatabaseTests(db);
+
 
     return 0;
 }
