@@ -161,7 +161,7 @@ void Database::updateUser(int id, const std::string& newName, int newAge) {
 
 
 
-// DELTE USER FROM TABLE USERS WITH ID
+// DELETE USER FROM TABLE USERS WITH ID
 
 
 void Database::deleteUserByID(int id) {
@@ -227,6 +227,36 @@ void Database::findUserByName(const std::string& name) {
     // 4. Statement freigeben
     sqlite3_finalize(stmt);
 }
+
+
+std::vector<User> Database::getAllUsers() {
+    const char* sql = "SELECT id, name, age FROM users;";
+    sqlite3_stmt* stmt = nullptr;
+    std::vector<User> users;
+
+    // 1. Statement vorbereiten
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Prepare-Fehler (SELECT): " << sqlite3_errmsg(db_) << "\n";
+        return users;
+    }
+
+    // 2. Zeilenweise abarbeiten
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        User user;
+        user.id = sqlite3_column_int(stmt, 0);
+        const unsigned char* nameText = sqlite3_column_text(stmt, 1);
+        user.name = nameText ? reinterpret_cast<const char*>(nameText) : "";
+        user.age = sqlite3_column_int(stmt, 2);
+
+        users.push_back(user);
+    }
+
+    // 3. Statement freigeben
+    sqlite3_finalize(stmt);
+
+    return users;
+}
+
 
 
 

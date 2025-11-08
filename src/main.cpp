@@ -21,6 +21,12 @@ int main() {
     db.findUserByName("Kilian L.");
     db.findUserByName("Unbekannt");
 
+    auto users = db.getAllUsers();
+    for (const auto& user : users) {
+        std::cout << "ID: " << user.id
+                  << " | Name: " << user.name
+                  << " | Alter: " << user.age << '\n';
+    }
 
 
     db.printAllUsers();

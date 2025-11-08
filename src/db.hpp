@@ -3,6 +3,8 @@
 
 #include <string>
 #include <sqlite3.h>
+#include "user.hpp"
+#include <vector>
 
 
 class Database {
@@ -28,6 +30,7 @@ public:
 
 
 
+    std::vector<User> getAllUsers();
 
 
 private:
